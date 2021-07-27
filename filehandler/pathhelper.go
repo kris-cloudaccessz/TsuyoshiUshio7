@@ -1,6 +1,8 @@
-package imghandler
+package filehandler
 
 import (
+	"fmt"
+	"log"
 	"strconv"
 	"strings"
 )
@@ -27,6 +29,22 @@ func SortPath(str []byte) string {
 	return ret.String()
 }
 
-func SavePath() string {
+func isMd5Str(str string) bool {
+	return regexpURLParse.MatchString(str)
+}
 
+func SavePath(md5Str string) string {
+	firstDir, err := strconv.ParseUint(md5Str[:3], 16, 32)
+	if err != nil {
+		log.Fatal(err)
+		return ""
+	}
+
+	secondDir, err := strconv.ParseUint(md5Str[3:6], 16, 32)
+	if err != nil {
+		log.Fatal(err)
+		return ""
+	}
+
+	return fmt.Sprintf("%d/%d/%s", firstDir, secondDir, md5Str)
 }

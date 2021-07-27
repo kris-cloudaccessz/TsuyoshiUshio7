@@ -1,8 +1,8 @@
 package route
 
 import (
-	"goimg/controller"
-	"goimg/server"
+	"go-image/controller"
+	"go-image/server"
 )
 
 // RegisterRoute Register Route.

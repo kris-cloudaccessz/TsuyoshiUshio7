@@ -1,7 +1,7 @@
 package server
 
 import (
-	"goimg/config"
+	"go-image/config"
 	"log"
 	"net/http"
 	"strconv"

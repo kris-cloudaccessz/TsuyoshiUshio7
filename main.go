@@ -1,8 +1,8 @@
 package main
 
 import (
-	"goimg/route"
-	"goimg/server"
+	"go-image/route"
+	"go-image/server"
 )
 
 func main() {

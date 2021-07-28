@@ -9,6 +9,8 @@ import (
 	"os"
 )
 
+const filechunk = 8192
+
 func GetFileHash(f *os.File) string {
 	h := md5.New()
 
@@ -23,15 +25,15 @@ func GetBigFileHash(f *os.File) string {
 	info, _ := f.Stat()
 	fileSize := info.Size()
 
-	blocks := uint64(math.Ceil(float64(filesize) / float64(filechunk)))
+	blocks := uint64(math.Ceil(float64(fileSize) / float64(filechunk)))
 
 	hash := md5.New()
 
 	for i := uint64(0); i < blocks; i++ {
-		blocksize := int(math.Min(filechunk, float64(filesize-int64(i*filechunk))))
+		blocksize := int(math.Min(filechunk, float64(fileSize-int64(i*filechunk))))
 		buf := make([]byte, blocksize)
 
-		file.Read(buf)
+		f.Read(buf)
 		io.WriteString(hash, string(buf)) // append into the hash
 	}
 

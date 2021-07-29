@@ -37,5 +37,5 @@ func GetBigFileHash(f *os.File) string {
 		io.WriteString(hash, string(buf)) // append into the hash
 	}
 
-	fmt.Sprintf("%x", hash.Sum(nil))
+	return fmt.Sprintf("%x", hash.Sum(nil))
 }

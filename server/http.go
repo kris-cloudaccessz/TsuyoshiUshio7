@@ -26,7 +26,7 @@ func RunServer() {
 	webPath := config.GetSetting("http.webPath")
 
 	if len(webPath) != 0 {
-		serveMux.Handle("/index/", http.StripPrefix("/index/", http.FileServer(http.Dir("www"))))
+		serveMux.Handle("/index/", http.StripPrefix("/index/", http.FileServer(http.Dir(webPath))))
 	}
 
 	readTimeout, err := strconv.Atoi(config.GetSetting("http.readTimeout"))

@@ -1,4 +1,4 @@
-package imghandler
+package filehandler
 
 import (
 	"strings"

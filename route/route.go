@@ -7,6 +7,6 @@ import (
 
 // RegisterRoute Register Route.
 func RegisterRoute() {
-	server.HandleFunc("/index/", controller.Index)
+	server.HandleFunc("/", controller.Index)
 	server.HandleFunc("/upload", controller.Upload)
 }

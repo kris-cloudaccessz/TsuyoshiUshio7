@@ -5,6 +5,8 @@ import (
 	"log"
 	"regexp"
 	"strings"
+
+	"gopkg.in/gographics/imagick.v3/imagick"
 )
 
 var regexpURLParse *regexp.Regexp
@@ -13,6 +15,10 @@ var fileSavePath string
 var imageTypes []string
 
 func init() {
+
+	imagick.Initialize()
+	// defer imagick.Terminate()
+
 	imageSavePath = config.GetSetting("image.path")
 	fileSavePath = config.GetSetting("file.path")
 	imageTypes = strings.Split(config.GetSetting("image.type"), ",")

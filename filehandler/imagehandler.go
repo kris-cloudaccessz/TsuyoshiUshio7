@@ -43,11 +43,11 @@ func ResizeImage(imagePath string, w uint, h uint, outPath string) error {
 	return nil
 }
 
-func CompressionImage(imagePath string, outPath string, quality uint) error {
+func CompressionImage(imageByte []byte, outPath string, quality uint) error {
 	mw := imagick.NewMagickWand()
 	defer mw.Destroy()
 
-	err := mw.ReadImage(imagePath)
+	err := mw.ReadImageBlob(imageByte)
 	if err != nil {
 		log.Println(err)
 		return errors.New("CompressionImage: 读取图片错误")

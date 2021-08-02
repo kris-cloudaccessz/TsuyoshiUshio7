@@ -1,6 +1,7 @@
 package filehandler
 
 import (
+	"bufio"
 	"crypto/md5"
 	"fmt"
 	"io"
@@ -11,10 +12,10 @@ import (
 
 const filechunk = 8192
 
-func GetFileHash(f *os.File) string {
+func GetFileHash(r *bufio.Reader) string {
 	h := md5.New()
 
-	if _, err := io.Copy(h, f); err != nil {
+	if _, err := io.Copy(h, r); err != nil {
 		log.Fatal(err)
 	}
 

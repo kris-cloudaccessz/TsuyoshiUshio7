@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"bufio"
 	"fmt"
-	"io"
+	"go-image/filehandler"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -25,10 +27,10 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	md5Str := parse.Path
 
-	fmt.Println(md5Str)
-	f := md5Str[1:4]
+	// fmt.Println(md5Str)
+	// f := md5Str[1:4]
 
-	fmt.Println(f)
+	fmt.Println(md5Str)
 
 	// n, err := strconv.ParseUint(f, 16, 32)
 	// if err != nil {
@@ -47,35 +49,41 @@ func Index(w http.ResponseWriter, r *http.Request) {
 //Upload upload file function.
 func Upload(w http.ResponseWriter, r *http.Request) {
 
-	r.ParseMultipartForm(1024 << 12)
+	r.ParseMultipartForm(1024 << 14)
 
-	formFile, header, err := r.FormFile("file")
-	if err != nil {
-		log.Printf("Get form file failed: %s \n", err)
-		return
-	}
-	defer formFile.Close()
+	files := r.MultipartForm.File["files"]
 
-	destFile, err := os.Create("./upload/" + header.Filename)
-	if err != nil {
-		log.Printf("Create failed: %s \n", err)
-		return
-	}
-	defer destFile.Close()
+	for i := 0; i < len(files); i++ {
+		file, err := files[i].Open()
+		if err != nil {
+			return
+		}
+		defer file.Close()
 
-	_, err = io.Copy(destFile, formFile)
-	if err != nil {
-		log.Printf("Write file failed: %s \n", err)
-		return
+		bufferFile := bufio.NewReader(file)
+
+		md5Str := filehandler.GetFileHash(bufferFile)
+		md5Path := filehandler.SavePath(md5Str)
+
+		file.Seek(0, 0)
+
+		dirPath := "upload/" + md5Path + "/"
+
+		err = os.MkdirAll(dirPath, os.ModePerm)
+		if err != nil {
+			log.Println(err)
+		}
+
+		b, err := ioutil.ReadAll(bufferFile)
+		if err != nil {
+			log.Println(err)
+		}
+
+		err = filehandler.CompressionImage(b, dirPath+"0_0", 75)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 
 	fmt.Fprint(w, "ok!")
-	// r.ParseForm()
-	// fmt.Println(r.PostForm["id"])
-
-	// r.ParseMultipartForm(1024 << 12)
-	// if r.MultipartForm != nil {
-	// 	fmt.Fprintln(w, r.MultipartForm.Value["id"][0])
-	// }
-
 }

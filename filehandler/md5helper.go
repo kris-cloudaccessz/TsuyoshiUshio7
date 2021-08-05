@@ -22,6 +22,10 @@ func GetFileHash(r *bufio.Reader) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
+func GetHash(b []byte) string {
+	return fmt.Sprintf("%x", md5.Sum(b))
+}
+
 func GetBigFileHash(f *os.File) string {
 	info, _ := f.Stat()
 	fileSize := info.Size()

@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"bufio"
 	"fmt"
 	"go-image/filehandler"
 	"io/ioutil"
@@ -60,9 +59,9 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		}
 		defer file.Close()
 
-		bufferFile := bufio.NewReader(file)
+		b, err := ioutil.ReadAll(file)
 
-		md5Str := filehandler.GetFileHash(bufferFile)
+		md5Str := filehandler.GetHash(b)
 		md5Path := filehandler.SavePath(md5Str)
 
 		file.Seek(0, 0)
@@ -74,7 +73,6 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 		}
 
-		b, err := ioutil.ReadAll(bufferFile)
 		if err != nil {
 			log.Println(err)
 		}

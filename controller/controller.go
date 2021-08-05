@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"go-image/filehandler"
+	"go-image/model"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -52,7 +53,13 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 
 	files := r.MultipartForm.File["files"]
 
+	var response = new(model.ResponseModel)
+
+	var fileInfos []*model.FileInfoModel
+
 	for i := 0; i < len(files); i++ {
+
+		fileInfo := new(model.FileInfoModel)
 		file, err := files[i].Open()
 		if err != nil {
 			return
@@ -60,28 +67,41 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		defer file.Close()
 
 		b, err := ioutil.ReadAll(file)
+		if err != nil {
+			log.Println(err)
+		}
 
-		md5Str := filehandler.GetHash(b)
-		md5Path := filehandler.SavePath(md5Str)
+		filetype := filehandler.GetFileType(&b)
+
+		if !IsType(filetype) {
+			w.Write(response.ResponseJson(model.StatusImgIsType, false, nil))
+			return
+		}
+
+		md5Str := filehandler.GetHash(&b)
+		md5Path := SavePath(md5Str)
 
 		file.Seek(0, 0)
 
-		dirPath := "upload/" + md5Path + "/"
+		dirPath := imagePath + md5Path + "/"
 
 		err = os.MkdirAll(dirPath, os.ModePerm)
 		if err != nil {
 			log.Println(err)
+			w.Write(response.ResponseJson(model.StatusMkdir, false, nil))
+			return
 		}
 
+		err = filehandler.CompressionImage(b, dirPath+"0_0", 75, fileInfo)
 		if err != nil {
 			log.Println(err)
+			w.Write(response.ResponseJson(model.StatusImgCompression, false, nil))
+			return
 		}
+		fileInfo.FileID = md5Str
 
-		err = filehandler.CompressionImage(b, dirPath+"0_0", 75)
-		if err != nil {
-			log.Println(err)
-		}
+		fileInfos = append(fileInfos, fileInfo)
 	}
 
-	fmt.Fprint(w, "ok!")
+	w.Write(response.ResponseJson(model.StatusOK, true, fileInfos))
 }

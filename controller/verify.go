@@ -1,8 +1,10 @@
-package filehandler
+package controller
 
-import (
-	"strings"
-)
+import "strings"
+
+func isMd5Str(str string) bool {
+	return regexpURLParse.MatchString(str)
+}
 
 //IsType 判断类型是否允许上传
 func IsType(typeStr string) bool {

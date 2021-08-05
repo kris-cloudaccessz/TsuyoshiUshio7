@@ -2,6 +2,7 @@ package filehandler
 
 import (
 	"errors"
+	"go-image/model"
 	"log"
 
 	"gopkg.in/gographics/imagick.v3/imagick"
@@ -43,7 +44,7 @@ func ResizeImage(imagePath string, w uint, h uint, outPath string) error {
 	return nil
 }
 
-func CompressionImage(imageByte []byte, outPath string, quality uint) error {
+func CompressionImage(imageByte []byte, outPath string, quality uint, fileInfo *model.FileInfoModel) error {
 	mw := imagick.NewMagickWand()
 	defer mw.Destroy()
 
@@ -53,10 +54,18 @@ func CompressionImage(imageByte []byte, outPath string, quality uint) error {
 		return errors.New("CompressionImage: 读取图片错误")
 	}
 
+	fileInfo.Mime = mw.GetImageFormat()
+
 	err = mw.SetImageCompressionQuality(quality)
 	if err != nil {
 		log.Println(err)
 		return errors.New("CompressionImage: 压缩图片错误")
+	}
+
+	fileInfo.Size, err = mw.GetImageLength()
+	if err != nil {
+		log.Println(err)
+		return errors.New("CompressionImage：获取图片字节错误")
 	}
 
 	err = mw.WriteImage(outPath)

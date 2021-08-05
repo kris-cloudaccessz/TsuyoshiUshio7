@@ -1,4 +1,4 @@
-package filehandler
+package controller
 
 import (
 	"fmt"
@@ -27,10 +27,6 @@ func SortPath(str []byte) string {
 	}
 
 	return ret.String()
-}
-
-func isMd5Str(str string) bool {
-	return regexpURLParse.MatchString(str)
 }
 
 func SavePath(md5Str string) string {

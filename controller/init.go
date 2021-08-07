@@ -15,8 +15,13 @@ func init() {
 	var err error
 
 	imagePath = config.GetSetting("image.path")
+
 	if len(imagePath) == 0 {
 		imagePath = "image/"
+	} else {
+		if imagePath[len(imagePath):] != "/" {
+			imagePath = imagePath + "/"
+		}
 	}
 
 	regexpURLParse, err = regexp.Compile("[a-z0-9]{32}")

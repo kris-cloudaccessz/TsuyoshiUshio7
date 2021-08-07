@@ -42,5 +42,5 @@ func SavePath(md5Str string) string {
 		return ""
 	}
 
-	return fmt.Sprintf("%d/%d/%s", firstDir, secondDir, md5Str)
+	return fmt.Sprintf("%d/%d/%s", firstDir/4, secondDir/4, md5Str)
 }

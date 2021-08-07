@@ -51,7 +51,7 @@ func CompressionImage(imageByte []byte, outPath string, quality uint, fileInfo *
 	err := mw.ReadImageBlob(imageByte)
 	if err != nil {
 		log.Println(err)
-		return errors.New("CompressionImage: 读取图片错误")
+		return errors.New("压缩读取图片错误")
 	}
 
 	fileInfo.Mime = mw.GetImageFormat()
@@ -59,19 +59,19 @@ func CompressionImage(imageByte []byte, outPath string, quality uint, fileInfo *
 	err = mw.SetImageCompressionQuality(quality)
 	if err != nil {
 		log.Println(err)
-		return errors.New("CompressionImage: 压缩图片错误")
+		return errors.New("压缩图片错误")
 	}
 
 	fileInfo.Size, err = mw.GetImageLength()
 	if err != nil {
 		log.Println(err)
-		return errors.New("CompressionImage：获取图片字节错误")
+		return errors.New("获取图片字节错误")
 	}
 
 	err = mw.WriteImage(outPath)
 	if err != nil {
 		log.Println(err)
-		return errors.New("CompressionImage：写入图片错误")
+		return errors.New("写入图片错误")
 	}
 
 	return nil

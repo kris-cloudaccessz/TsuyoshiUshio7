@@ -53,29 +53,40 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 
 	files := r.MultipartForm.File["files"]
 
-	var response = new(model.ResponseModel)
-
-	var fileInfos []*model.FileInfoModel
+	var response []*model.ResponseModel
 
 	for i := 0; i < len(files); i++ {
+		resp := model.NewResponseModel()
+		// fileInfo := new(model.FileInfoModel)
+		// resp.Data = fileInfo
 
-		fileInfo := new(model.FileInfoModel)
 		file, err := files[i].Open()
 		if err != nil {
-			return
+			resp.Success = false
+			resp.Message = "读取file数据失败"
+			response = append(response, resp)
+			break
 		}
 		defer file.Close()
 
+		resp.Data.FileName = files[i].Filename
+
 		b, err := ioutil.ReadAll(file)
 		if err != nil {
-			log.Println(err)
+			resp.Success = false
+			resp.Message = "读取file数据失败"
+			response = append(response, resp)
+			break
 		}
 
 		filetype := filehandler.GetFileType(&b)
+		resp.Data.Mime = filetype
 
 		if !IsType(filetype) {
-			w.Write(response.ResponseJson(model.StatusImgIsType, false, nil))
-			return
+			resp.Success = false
+			resp.Message = "图片类型不符合"
+			response = append(response, resp)
+			break
 		}
 
 		md5Str := filehandler.GetHash(&b)
@@ -87,21 +98,23 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 
 		err = os.MkdirAll(dirPath, os.ModePerm)
 		if err != nil {
-			log.Println(err)
-			w.Write(response.ResponseJson(model.StatusMkdir, false, nil))
-			return
+			resp.Success = false
+			resp.Message = "创建目录失败"
+			response = append(response, resp)
+			break
 		}
 
-		err = filehandler.CompressionImage(b, dirPath+"0_0", 75, fileInfo)
+		err = filehandler.CompressionImage(b, dirPath+"0_0", 75, resp.Data)
 		if err != nil {
-			log.Println(err)
-			w.Write(response.ResponseJson(model.StatusImgCompression, false, nil))
-			return
+			resp.Success = false
+			resp.Message = err.Error()
+			response = append(response, resp)
+			break
 		}
-		fileInfo.FileID = md5Str
 
-		fileInfos = append(fileInfos, fileInfo)
+		resp.Data.FileID = md5Str
+		response = append(response, resp)
 	}
 
-	w.Write(response.ResponseJson(model.StatusOK, true, fileInfos))
+	w.Write(model.ResponseJson(response))
 }

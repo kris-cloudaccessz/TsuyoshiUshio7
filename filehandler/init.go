@@ -12,25 +12,24 @@ func init() {
 	imagick.Initialize()
 	// defer imagick.Terminate()
 
-	fileTypeMap.Store("ffd8ffe000104a464946", "jpg")  //JPEG (jpg)
-	fileTypeMap.Store("89504e470d0a1a0a0000", "png")  //PNG (png)
-	fileTypeMap.Store("47494638396126026f01", "gif")  //GIF (gif)
-	fileTypeMap.Store("49492a00227105008037", "tif")  //TIFF (tif)
-	fileTypeMap.Store("424d228c010000000000", "bmp")  //16色位图(bmp)
-	fileTypeMap.Store("424d8240090000000000", "bmp")  //24位位图(bmp)
-	fileTypeMap.Store("424d8e1b030000000000", "bmp")  //256色位图(bmp)
-	fileTypeMap.Store("41433130313500000000", "dwg")  //CAD (dwg)
-	fileTypeMap.Store("3c21444f435459504520", "html") //HTML (html)   3c68746d6c3e0  3c68746d6c3e0
-	fileTypeMap.Store("3c68746d6c3e0", "html")        //HTML (html)   3c68746d6c3e0  3c68746d6c3e0
-	fileTypeMap.Store("3c21646f637479706520", "htm")  //HTM (htm)
-	fileTypeMap.Store("48544d4c207b0d0a0942", "css")  //css
-	fileTypeMap.Store("696b2e71623d696b2e71", "js")   //js
-	fileTypeMap.Store("7b5c727466315c616e73", "rtf")  //Rich Text Format (rtf)
-	fileTypeMap.Store("38425053000100000000", "psd")  //Photoshop (psd)
-	fileTypeMap.Store("46726f6d3a203d3f6762", "eml")  //Email [Outlook Express 6] (eml)
-	fileTypeMap.Store("d0cf11e0a1b11ae10000", "doc")  //MS Excel 注意：word、msi 和 excel的文件头一样
-	fileTypeMap.Store("d0cf11e0a1b11ae10000", "vsd")  //Visio 绘图
-	fileTypeMap.Store("5374616E64617264204A", "mdb")  //MS Access (mdb)
+	fileTypeMap.Store("ffd8ff", "jpg")   //JPEG (jpg)
+	fileTypeMap.Store("89504e47", "png") //PNG (png)
+	fileTypeMap.Store("47494638", "gif") //GIF (gif)
+	fileTypeMap.Store("49492a00", "tif") //TIFF (tif)
+	fileTypeMap.Store("424d", "bmp")     //16色位图(bmp)
+	// fileTypeMap.Store("424d8240090000000000", "bmp")  //24位位图(bmp)
+	// fileTypeMap.Store("424d8e1b030000000000", "bmp")  //256色位图(bmp)
+	fileTypeMap.Store("41433130", "dwg")             //CAD (dwg)
+	fileTypeMap.Store("68746d6c3e", "html")          //HTML (html)   3c68746d6c3e0  3c68746d6c3e0
+	fileTypeMap.Store("3c21646f637479706520", "htm") //HTM (htm)
+	fileTypeMap.Store("48544d4c207b0d0a0942", "css") //css
+	fileTypeMap.Store("696b2e71623d696b2e71", "js")  //js
+	fileTypeMap.Store("7b5c727466315c616e73", "rtf") //Rich Text Format (rtf)
+	fileTypeMap.Store("38425053000100000000", "psd") //Photoshop (psd)
+	fileTypeMap.Store("46726f6d3a203d3f6762", "eml") //Email [Outlook Express 6] (eml)
+	fileTypeMap.Store("d0cf11e0a1b11ae10000", "doc") //MS Excel 注意：word、msi 和 excel的文件头一样
+	fileTypeMap.Store("d0cf11e0a1b11ae10000", "vsd") //Visio 绘图
+	fileTypeMap.Store("5374616E64617264204A", "mdb") //MS Access (mdb)
 	fileTypeMap.Store("252150532D41646F6265", "ps")
 	fileTypeMap.Store("255044462d312e350d0a", "pdf")  //Adobe Acrobat (pdf)
 	fileTypeMap.Store("2e524d46000000120001", "rmvb") //rmvb/rm相同
@@ -42,7 +41,7 @@ func init() {
 	fileTypeMap.Store("52494646e27807005741", "wav") //Wave (wav)
 	fileTypeMap.Store("52494646d07d60074156", "avi")
 	fileTypeMap.Store("4d546864000000060001", "mid") //MIDI (mid)
-	fileTypeMap.Store("504b0304140000000800", "zip")
+	fileTypeMap.Store("504B0304", "zip")
 	fileTypeMap.Store("526172211a0700cf9073", "rar")
 	fileTypeMap.Store("235468697320636f6e66", "ini")
 	fileTypeMap.Store("504b03040a0000000000", "jar")

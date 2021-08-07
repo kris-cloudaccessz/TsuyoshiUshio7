@@ -8,13 +8,13 @@ import (
 )
 
 // 获取前面结果字节的二进制
-func bytesToHexString(src *[]byte) string {
+func bytesToHexString(src []byte) string {
 	res := bytes.Buffer{}
-	if src == nil || len(*src) <= 0 {
+	if src == nil || len(src) <= 0 {
 		return ""
 	}
 	temp := make([]byte, 0)
-	for _, v := range *src {
+	for _, v := range src {
 		sub := v & 0xFF
 		hv := hex.EncodeToString(append(temp, sub))
 		if len(hv) < 2 {
@@ -29,7 +29,7 @@ func bytesToHexString(src *[]byte) string {
 // fSrc: 文件字节流（就用前面几个字节）
 func GetFileType(fSrc *[]byte) string {
 	var fileType string
-	fileCode := bytesToHexString(fSrc)
+	fileCode := bytesToHexString((*fSrc)[:8])
 
 	fileTypeMap.Range(func(key, value interface{}) bool {
 		k := key.(string)

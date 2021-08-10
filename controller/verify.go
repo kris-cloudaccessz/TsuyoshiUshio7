@@ -1,6 +1,9 @@
 package controller
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+)
 
 func isMd5Str(str string) bool {
 	return regexpURLParse.MatchString(str)
@@ -15,4 +18,21 @@ func IsType(typeStr string) bool {
 	}
 
 	return false
+}
+
+func StringToInt(str string) int {
+	if len(str) == 0 {
+		return 0
+	}
+
+	i, err := strconv.Atoi(str)
+	if err != nil {
+		return 0
+	}
+
+	if i <= 0 {
+		return 0
+	}
+
+	return i
 }

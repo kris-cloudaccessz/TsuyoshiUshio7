@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-image/filehandler"
 	"go-image/model"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -23,14 +24,50 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	parse, err := url.Parse(urlStr)
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 
-	md5Str := parse.Path
+	path := ParseUrlPath(parse.Path[1:])
+	if path == "" {
+		return
+	}
+
+	width := StringToInt(r.FormValue("w"))
+	height := StringToInt(r.FormValue("h"))
+
+	dirPath := imagePath + path
+
+	if width == 0 || height == 0 {
+		file, err := os.Open(dirPath + "/0_0")
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+		defer file.Close()
+
+		io.Copy(w, file)
+		return
+	}
+
+	filePath := fmt.Sprintf("%s/%d_%d", dirPath, width, height)
+
+	file, err := os.Open(filePath)
+	if err == nil {
+		io.Copy(w, file)
+		return
+	}
+	defer file.Close()
+
+	b, err := filehandler.ResizeImage(dirPath+"/0_0", uint(width), uint(height), filePath)
+	if err != nil {
+
+	}
+
+	w.Write(b)
+	return
 
 	// fmt.Println(md5Str)
 	// f := md5Str[1:4]
-
-	fmt.Println(md5Str)
 
 	// n, err := strconv.ParseUint(f, 16, 32)
 	// if err != nil {

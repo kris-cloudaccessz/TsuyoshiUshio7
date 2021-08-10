@@ -44,3 +44,11 @@ func SavePath(md5Str string) string {
 
 	return fmt.Sprintf("%d/%d/%s", firstDir/4, secondDir/4, md5Str)
 }
+
+func ParseUrlPath(urlPath string) string {
+	if !isMd5Str(urlPath) {
+		return ""
+	}
+
+	return SavePath(urlPath)
+}

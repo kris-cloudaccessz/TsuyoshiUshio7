@@ -43,9 +43,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 			return
 		}
-		defer file.Close()
-
 		io.Copy(w, file)
+		file.Close()
 		return
 	}
 
@@ -54,9 +53,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open(filePath)
 	if err == nil {
 		io.Copy(w, file)
+		file.Close()
 		return
 	}
-	defer file.Close()
 
 	b, err := filehandler.ResizeImage(dirPath+"/0_0", uint(width), uint(height), filePath)
 	if err != nil {
@@ -64,7 +63,6 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(b)
-	return
 
 	// fmt.Println(md5Str)
 	// f := md5Str[1:4]
@@ -83,7 +81,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	// fmt.Fprintln(w, r.URL.String())
 }
 
-//Upload upload file function.
+//Uploads upload files function.
 func Upload(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(1024 << 14)

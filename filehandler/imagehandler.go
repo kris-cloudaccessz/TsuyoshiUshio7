@@ -21,15 +21,28 @@ func ResizeImage(imagePath string, w uint, h uint, outPath string) ([]byte, erro
 	width := mw.GetImageWidth()
 	height := mw.GetImageHeight()
 
-	if width < w {
-		w = width
+	var x, y int
+	var w1, h1 uint
+
+	if width < height {
+		h1 = height * w / width
+		w1 = w
+		x = 0
+		y = int((h1 - h) / 2)
+	} else {
+		w1 = h * width / height
+		h1 = h
+		x = int((w1 - w) / 2)
+		y = 0
 	}
 
-	if height < h {
-		h = height
+	err = mw.ResizeImage(w1, h1, imagick.FILTER_LANCZOS)
+	if err != nil {
+		log.Println(err)
+		return nil, errors.New("缩放图片错误")
 	}
 
-	err = mw.ResizeImage(w, h, imagick.FILTER_LANCZOS)
+	err = mw.CropImage(w, h, x, y)
 	if err != nil {
 		log.Println(err)
 		return nil, errors.New("裁切图片错误")

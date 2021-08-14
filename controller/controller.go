@@ -34,12 +34,22 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	grayscale := StringToBool(r.FormValue("g"))
+
+	var g int8
+	if grayscale {
+		g = 1
+	} else {
+		g = 0
+	}
+
+	rotate := StringToFloat64(r.FormValue("r"))
 	width := StringToInt(r.FormValue("w"))
 	height := StringToInt(r.FormValue("h"))
 
 	dirPath := imagePath + path
 
-	if width == 0 || height == 0 {
+	if width == 0 && height == 0 {
 		file, err := os.Open(dirPath + "/0_0")
 		if err != nil {
 			log.Fatal(err)
@@ -51,7 +61,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filePath := fmt.Sprintf("%s/%d_%d", dirPath, width, height)
+	filePath := fmt.Sprintf("%s/%d_%d_g%d_r%.0f", dirPath, width, height, g, rotate)
 
 	file, err := os.Open(filePath)
 	if err == nil {
@@ -60,7 +70,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	b, err := filehandler.ResizeImage(dirPath+"/0_0", uint(width), uint(height), filePath)
+	b, err := filehandler.ResizeImage(dirPath+"/0_0", uint(width), uint(height), rotate, grayscale, filePath)
 	if err != nil {
 		log.Fatal(err)
 		responseError(w, model.StatusServerError)

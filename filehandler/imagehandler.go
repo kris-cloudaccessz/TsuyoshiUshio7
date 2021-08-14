@@ -8,7 +8,7 @@ import (
 	"gopkg.in/gographics/imagick.v3/imagick"
 )
 
-func ResizeImage(imagePath string, w uint, h uint, outPath string) ([]byte, error) {
+func ResizeImage(imagePath string, w uint, h uint, outPath string) (*[]byte, error) {
 	mw := imagick.NewMagickWand()
 	defer mw.Destroy()
 
@@ -55,7 +55,7 @@ func ResizeImage(imagePath string, w uint, h uint, outPath string) ([]byte, erro
 		log.Println(err)
 	}
 
-	return b, nil
+	return &b, nil
 }
 
 func CompressionImage(imageByte []byte, outPath string, quality uint, fileInfo *model.FileInfoModel) error {

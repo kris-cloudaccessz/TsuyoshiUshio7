@@ -24,11 +24,13 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	parse, err := url.Parse(urlStr)
 	if err != nil {
 		log.Fatal(err)
+		responseError(w, model.StatusNotFound)
 		return
 	}
 
 	path := ParseUrlPath(parse.Path[1:])
 	if path == "" {
+		responseError(w, model.StatusNotFound)
 		return
 	}
 
@@ -41,6 +43,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		file, err := os.Open(dirPath + "/0_0")
 		if err != nil {
 			log.Fatal(err)
+			responseError(w, model.StatusServerError)
 			return
 		}
 		io.Copy(w, file)
@@ -59,26 +62,12 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	b, err := filehandler.ResizeImage(dirPath+"/0_0", uint(width), uint(height), filePath)
 	if err != nil {
-
+		log.Fatal(err)
+		responseError(w, model.StatusServerError)
+		return
 	}
 
-	w.Write(b)
-
-	// fmt.Println(md5Str)
-	// f := md5Str[1:4]
-
-	// n, err := strconv.ParseUint(f, 16, 32)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	//fmt.Println(n)
-
-	// s := imghandler.SortPath([]byte(md5Str[:5]))
-
-	// fmt.Fprintln(w, s)
-
-	// fmt.Fprintln(w, r.URL.String())
+	w.Write(*b)
 }
 
 //Uploads upload files function.
@@ -152,4 +141,10 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(model.ResponseJson(response))
+}
+
+func responseError(w http.ResponseWriter, code int) {
+	html := fmt.Sprintf("<html><body><h1>%s</h1></body></html>", model.StatusText(code))
+	w.WriteHeader(code)
+	fmt.Fprintln(w, html)
 }

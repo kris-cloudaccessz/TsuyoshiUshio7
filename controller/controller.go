@@ -23,7 +23,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	parse, err := url.Parse(urlStr)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		responseError(w, model.StatusNotFound)
 		return
 	}
@@ -52,7 +52,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	if width == 0 && height == 0 {
 		file, err := os.Open(dirPath + "/0_0")
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 			responseError(w, model.StatusServerError)
 			return
 		}
@@ -72,7 +72,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	b, err := filehandler.ResizeImage(dirPath+"/0_0", uint(width), uint(height), rotate, grayscale, filePath)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		responseError(w, model.StatusServerError)
 		return
 	}

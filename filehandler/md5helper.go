@@ -16,7 +16,7 @@ func GetFileHash(r *bufio.Reader) string {
 	h := md5.New()
 
 	if _, err := io.Copy(h, r); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	return fmt.Sprintf("%x", h.Sum(nil))

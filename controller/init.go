@@ -26,7 +26,7 @@ func init() {
 
 	regexpURLParse, err = regexp.Compile("[a-z0-9]{32}")
 	if err != nil {
-		log.Fatalln("regexpUrlParse:", err)
+		log.Println("regexpUrlParse:", err)
 	}
 
 	imageTypes = strings.Split(config.GetSetting("image.type"), ",")

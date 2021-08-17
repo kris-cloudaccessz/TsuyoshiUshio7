@@ -63,7 +63,7 @@ func ResizeImage(imagePath string, w uint, h uint, r float64, g bool, outPath st
 		//设置图片颜色灰度
 		err = mw.SetImageType(imagick.IMAGE_TYPE_GRAYSCALE)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 	}
 

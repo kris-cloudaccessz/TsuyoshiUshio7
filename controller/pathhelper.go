@@ -32,13 +32,13 @@ func SortPath(str []byte) string {
 func SavePath(md5Str string) string {
 	firstDir, err := strconv.ParseUint(md5Str[:3], 16, 32)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return ""
 	}
 
 	secondDir, err := strconv.ParseUint(md5Str[3:6], 16, 32)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return ""
 	}
 

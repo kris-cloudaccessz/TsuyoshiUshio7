@@ -13,7 +13,7 @@ func init() {
 	var err error
 	conf, err = ini.Load("config.ini")
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 	}
 }
 

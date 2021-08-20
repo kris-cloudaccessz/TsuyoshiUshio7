@@ -48,6 +48,7 @@ func RunServer() {
 		//IdleTimeout:       5 * time.Second,
 	}
 
+	serv.SetKeepAlivesEnabled(true)
 	err = serv.ListenAndServe()
 	if err != nil {
 		log.Println(err)

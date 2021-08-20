@@ -12,7 +12,7 @@ func isMd5Str(str string) bool {
 //IsType 判断类型是否允许上传
 func IsType(typeStr string) bool {
 	for _, v := range imageTypes {
-		if strings.ToLower(v) == strings.ToLower(typeStr) {
+		if strings.Contains(typeStr, strings.ToLower(v)) {
 			return true
 		}
 	}

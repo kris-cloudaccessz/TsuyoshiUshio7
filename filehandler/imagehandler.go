@@ -94,9 +94,7 @@ func CompressionImage(imageByte []byte, outPath string, quality uint, fileInfo *
 		return errors.New("压缩读取图片错误")
 	}
 
-	fileInfo.Mime = mw.GetImageFormat()
-
-	if fileInfo.Mime == "JPEG" || fileInfo.Mime == "JPG" {
+	if mw.GetImageFormat() == "JPEG" || mw.GetImageFormat() == "JPG" {
 		err = mw.SetImageCompressionQuality(quality)
 		if err != nil {
 			log.Println(err)

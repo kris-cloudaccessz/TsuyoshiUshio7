@@ -24,6 +24,5 @@ func init() {
 
 func main() {
 	route.RegisterRoute()
-
 	server.RunServer()
 }

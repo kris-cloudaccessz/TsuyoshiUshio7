@@ -14,9 +14,6 @@ const (
 	StatusImgNotFound    = 10
 	StatusUrlNotFound    = 11
 	StatusImgCompression = 12
-	StatusOK             = 200
-	StatusNotFound       = 404
-	StatusServerError    = 500
 )
 
 var statusText = map[int]string{
@@ -31,10 +28,10 @@ var statusText = map[int]string{
 	StatusImgEncode:      "图片生成失败",
 	StatusImgNotFound:    "没有找到图片",
 	StatusUrlNotFound:    "Url Not Found",
-	StatusOK:             "OK",
-	StatusNotFound:       "404 Not Found!",
 	StatusImgCompression: "图片压缩失败",
-	StatusServerError:    "服务器错误",
+	200:                  "OK",
+	404:                  "404 Not Found!",
+	500:                  "服务器错误",
 }
 
 // StatusText return status text.

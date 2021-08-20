@@ -24,13 +24,13 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	parse, err := url.Parse(urlStr)
 	if err != nil {
 		log.Println(err)
-		responseError(w, model.StatusNotFound)
+		http.NotFound(w, r)
 		return
 	}
 
 	path := ParseUrlPath(parse.Path[1:])
 	if path == "" {
-		responseError(w, model.StatusNotFound)
+		http.NotFound(w, r)
 		return
 	}
 
@@ -53,7 +53,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		file, err := os.Open(dirPath + "/0_0")
 		if err != nil {
 			log.Println(err)
-			responseError(w, model.StatusServerError)
+			http.Error(w, "服务器内部错误", http.StatusInternalServerError)
 			return
 		}
 		io.Copy(w, file)
@@ -73,7 +73,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	b, err := filehandler.ResizeImage(dirPath+"/0_0", uint(width), uint(height), rotate, grayscale, filePath)
 	if err != nil {
 		log.Println(err)
-		responseError(w, model.StatusServerError)
+		http.Error(w, "文件处理失败", http.StatusInternalServerError)
 		return
 	}
 
@@ -113,10 +113,9 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		filetype := filehandler.GetFileType(&b)
-		resp.Data.Mime = filetype
+		resp.Data.Mime = http.DetectContentType(b)
 
-		if !IsType(filetype) {
+		if !IsType(resp.Data.Mime) {
 			resp.Success = false
 			resp.Message = "图片类型不符合"
 			response = append(response, resp)
@@ -146,6 +145,8 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
+		resp.Success = true
+		resp.Message = "OK"
 		resp.Data.FileID = md5Str
 		response = append(response, resp)
 	}

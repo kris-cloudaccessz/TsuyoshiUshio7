@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"go-image/cache"
 	"go-image/filehandler"
 	"go-image/model"
 	"io"
@@ -10,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 )
 
 // Index 处理首页路径
@@ -50,19 +52,34 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	dirPath := imagePath + path
 
 	if width == 0 && height == 0 {
-		file, err := os.Open(dirPath + "/0_0")
+		//优先从缓存中读取
+		key := dirPath + "/0_0"
+		cacheValue := cache.Get(key)
+		if cacheValue != nil {
+			w.Write(*cacheValue)
+			return
+		}
+
+		//未找到缓存从磁盘读取
+		file, err := os.Open(key)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "服务器内部错误", http.StatusInternalServerError)
 			return
 		}
-		io.Copy(w, file)
+
+		b, err := ioutil.ReadAll(file)
+		cache.RedisClient.Set(key, b, time.Second*600)
+		w.Write(b)
 		file.Close()
 		return
 	}
 
 	filePath := fmt.Sprintf("%s/%d_%d_g%d_r%.0f", dirPath, width, height, g, rotate)
 
+	//从缓存读取
+
+	//从硬盘读取
 	file, err := os.Open(filePath)
 	if err == nil {
 		io.Copy(w, file)

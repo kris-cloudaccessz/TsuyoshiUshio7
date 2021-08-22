@@ -5,13 +5,11 @@ import (
 	"go-image/cache"
 	"go-image/filehandler"
 	"go-image/model"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
-	"time"
 )
 
 // Index 处理首页路径
@@ -50,18 +48,18 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	height := StringToInt(r.FormValue("h"))
 
 	dirPath := imagePath + path
+	sourceFilePath := dirPath + "/0_0"
 
 	if width == 0 && height == 0 {
 		//优先从缓存中读取
-		key := dirPath + "/0_0"
-		cacheValue := cache.Get(key)
-		if cacheValue != nil {
+		cacheValue := cache.Get(sourceFilePath)
+		if *cacheValue != nil {
 			w.Write(*cacheValue)
 			return
 		}
 
 		//未找到缓存从磁盘读取
-		file, err := os.Open(key)
+		file, err := os.Open(sourceFilePath)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "服务器内部错误", http.StatusInternalServerError)
@@ -69,7 +67,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		}
 
 		b, err := ioutil.ReadAll(file)
-		cache.RedisClient.Set(key, b, time.Second*600)
+		cache.Set(sourceFilePath, b)
 		w.Write(b)
 		file.Close()
 		return
@@ -79,20 +77,30 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	//从缓存读取
 
+	cacheValue := cache.Get(filePath)
+	if *cacheValue != nil {
+		w.Write(*cacheValue)
+		return
+	}
+
 	//从硬盘读取
 	file, err := os.Open(filePath)
 	if err == nil {
-		io.Copy(w, file)
+		b, _ := ioutil.ReadAll(file)
+		cache.Set(filePath, b)
+		w.Write(b)
 		file.Close()
 		return
 	}
 
-	b, err := filehandler.ResizeImage(dirPath+"/0_0", uint(width), uint(height), rotate, grayscale, filePath)
+	b, err := filehandler.ResizeImage(sourceFilePath, uint(width), uint(height), rotate, grayscale, filePath)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "文件处理失败", http.StatusInternalServerError)
 		return
 	}
+
+	cache.Set(sourceFilePath, *b)
 
 	w.Write(*b)
 }

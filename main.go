@@ -14,7 +14,6 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	defer logFile.Close()
 
 	log.SetOutput(logFile)
 	log.SetFlags(log.LstdFlags | log.Lshortfile | log.LUTC)

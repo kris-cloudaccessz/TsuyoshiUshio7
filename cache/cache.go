@@ -2,30 +2,39 @@ package cache
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"time"
 
 	"github.com/go-redis/redis"
 )
 
-var RedisClient *redis.Client
+var redisClient *redis.Client
 
-type RedisNil redis.Nil
+const expireTime = time.Second * 600
 
 func init() {
-	RedisClient = redis.NewClient(&redis.Options{
+	redisClient = redis.NewClient(&redis.Options{
 		Addr:     "127.0.0.1:6379",
 		Password: "",
 		DB:       0,
 	})
 
-	if _, err := RedisClient.Ping().Result(); err != nil {
+	if _, err := redisClient.Ping().Result(); err != nil {
 		fmt.Println(err)
 		os.Exit(0)
 	}
 }
 
+func Set(key string, value interface{}) {
+	err := redisClient.Set(key, value, expireTime).Err()
+	if err != nil {
+		log.Println(err)
+	}
+}
+
 func Get(key string) *[]byte {
-	val, err := RedisClient.Get(key).Bytes()
+	val, err := redisClient.Get(key).Bytes()
 	if err == redis.Nil || err == nil {
 		return &val
 	}

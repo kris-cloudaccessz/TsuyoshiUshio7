@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"go-image/cache"
+	"go-image/convert"
 	"go-image/filehandler"
 	"go-image/model"
 	"io/ioutil"
@@ -34,7 +35,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	grayscale := StringToBool(r.FormValue("g"))
+	grayscale := convert.StringToBool(r.FormValue("g"))
 
 	var g int8
 	if grayscale {
@@ -43,31 +44,38 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		g = 0
 	}
 
-	rotate := StringToFloat64(r.FormValue("r"))
-	width := StringToInt(r.FormValue("w"))
-	height := StringToInt(r.FormValue("h"))
+	rotate := convert.StringToFloat64(r.FormValue("r"))
+	width := convert.StringToInt(r.FormValue("w"))
+	height := convert.StringToInt(r.FormValue("h"))
 
 	dirPath := imagePath + path
 	sourceFilePath := dirPath + "/0_0"
+	md5Str := parse.Path[1:]
+	var cacheKey string
 
 	if width == 0 && height == 0 {
 		//优先从缓存中读取
-		cacheValue := cache.Get(sourceFilePath)
-		if *cacheValue != nil {
-			w.Write(*cacheValue)
-			return
+		if cache.IsCache {
+			cacheKey = md5Str + ":0_0"
+			cacheValue := cache.Get(cacheKey)
+			if *cacheValue != nil {
+				w.Write(*cacheValue)
+				return
+			}
 		}
 
 		//未找到缓存从磁盘读取
 		file, err := os.Open(sourceFilePath)
 		if err != nil {
 			log.Println(err)
-			http.Error(w, "服务器内部错误", http.StatusInternalServerError)
+			http.Error(w, "未找到文件", http.StatusNotFound)
 			return
 		}
 
 		b, err := ioutil.ReadAll(file)
-		cache.Set(sourceFilePath, b)
+		if cache.IsCache {
+			cache.Set(cacheKey, b, 600)
+		}
 		w.Write(b)
 		file.Close()
 		return
@@ -76,18 +84,22 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	filePath := fmt.Sprintf("%s/%d_%d_g%d_r%.0f", dirPath, width, height, g, rotate)
 
 	//从缓存读取
-
-	cacheValue := cache.Get(filePath)
-	if *cacheValue != nil {
-		w.Write(*cacheValue)
-		return
+	if cache.IsCache {
+		cacheKey = fmt.Sprintf("%s:%d_%d_g%d_r%.0f", md5Str, width, height, g, rotate)
+		cacheValue := cache.Get(cacheKey)
+		if *cacheValue != nil {
+			w.Write(*cacheValue)
+			return
+		}
 	}
 
 	//从硬盘读取
 	file, err := os.Open(filePath)
 	if err == nil {
 		b, _ := ioutil.ReadAll(file)
-		cache.Set(filePath, b)
+		if cache.IsCache {
+			cache.Set(cacheKey, b, 600)
+		}
 		w.Write(b)
 		file.Close()
 		return
@@ -100,7 +112,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cache.Set(sourceFilePath, *b)
+	if cache.IsCache {
+		cache.Set(cacheKey, *b, 600)
+	}
 
 	w.Write(*b)
 }

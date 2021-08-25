@@ -9,4 +9,5 @@ import (
 func RegisterRoute() {
 	server.HandleFunc("/", controller.Index)
 	server.HandleFunc("/upload", controller.Upload)
+	server.HandleFunc("/delete/", controller.Delete)
 }

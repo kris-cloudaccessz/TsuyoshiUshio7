@@ -11,13 +11,12 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 // Index 处理首页路径
 func Index(w http.ResponseWriter, r *http.Request) {
-
 	urlStr := r.URL.String()
-
 	if urlStr == "/favicon.ico" {
 		return
 	}
@@ -191,6 +190,41 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(model.ResponseJson(response))
+}
+
+func Delete(w http.ResponseWriter, r *http.Request) {
+	urlStr := r.URL.String()
+	if urlStr == "/favicon.ico" {
+		return
+	}
+
+	parse, err := url.Parse(urlStr)
+	if err != nil {
+		log.Println(err)
+		http.NotFound(w, r)
+		return
+	}
+	md5Str := parse.Path[strings.LastIndex(parse.Path, "/")+1:]
+
+	if !isMd5Str(md5Str) {
+		http.NotFound(w, r)
+		return
+	}
+
+	md5Path := SavePath(md5Str)
+
+	if _, err = os.Stat(imagePath + md5Path); err == nil || os.IsExist(err) {
+		err = os.RemoveAll(imagePath + md5Path)
+		if err != nil {
+			http.Error(w, "删除失败", http.StatusInternalServerError)
+			return
+		}
+		cache.Del(md5Str)
+		fmt.Fprintln(w, "ok")
+		return
+	}
+
+	fmt.Fprintln(w, "文件不存在")
 }
 
 func responseError(w http.ResponseWriter, code int) {

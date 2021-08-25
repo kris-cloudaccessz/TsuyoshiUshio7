@@ -50,3 +50,10 @@ func Get(key string) *[]byte {
 
 	return nil
 }
+
+func Del(key string) {
+	vals, err := redisClient.Keys(key + ":*").Result()
+	if err == redis.Nil || err == nil {
+		redisClient.Del(vals...)
+	}
+}

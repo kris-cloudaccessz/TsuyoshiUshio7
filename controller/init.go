@@ -10,6 +10,7 @@ import (
 var regexpURLParse *regexp.Regexp
 var imageTypes []string
 var imagePath string
+var adminIPs []string
 
 func init() {
 	var err error
@@ -30,4 +31,5 @@ func init() {
 	}
 
 	imageTypes = strings.Split(config.GetSetting("image.type"), ",")
+	adminIPs = strings.Split(config.GetSetting("server.admin_ips"), ",")
 }

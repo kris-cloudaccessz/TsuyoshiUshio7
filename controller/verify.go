@@ -18,3 +18,13 @@ func IsType(typeStr string) bool {
 
 	return false
 }
+
+func IsAllow(ip string) bool {
+	for _, v := range adminIPs {
+		if v == ip {
+			return true
+		}
+	}
+
+	return false
+}

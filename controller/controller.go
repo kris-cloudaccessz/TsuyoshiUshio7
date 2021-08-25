@@ -8,6 +8,7 @@ import (
 	"go-image/model"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -193,6 +194,12 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
+	remoteIP := getRemoteIp(r)
+	if !IsAllow(remoteIP) {
+		http.Error(w, "禁止访问", http.StatusForbidden)
+		return
+	}
+
 	urlStr := r.URL.String()
 	if urlStr == "/favicon.ico" {
 		return
@@ -231,4 +238,21 @@ func responseError(w http.ResponseWriter, code int) {
 	html := fmt.Sprintf("<html><body><h1>%s</h1></body></html>", model.StatusText(code))
 	w.WriteHeader(code)
 	fmt.Fprintln(w, html)
+}
+
+func getRemoteIp(req *http.Request) string {
+	remoteAddr := req.RemoteAddr
+	if ip := req.Header.Get("X-Real-IP"); ip != "" {
+		remoteAddr = ip
+	} else if ip = req.Header.Get("X-Forwarded-For"); ip != "" {
+		remoteAddr = ip
+	} else {
+		remoteAddr, _, _ = net.SplitHostPort(remoteAddr)
+	}
+
+	if remoteAddr == "::1" {
+		remoteAddr = "127.0.0.1"
+	}
+
+	return remoteAddr
 }

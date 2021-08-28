@@ -105,6 +105,11 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if _, err = os.Stat(sourceFilePath); err != nil && !os.IsExist(err) {
+		http.Error(w, "文件不存在", http.StatusNotFound)
+		return
+	}
+
 	b, err := filehandler.ResizeImage(sourceFilePath, uint(width), uint(height), rotate, grayscale, filePath)
 	if err != nil {
 		log.Println(err)

@@ -19,6 +19,23 @@ func StringToInt(str string) int {
 	return i
 }
 
+func StringToUint(str string) uint {
+	if len(str) == 0 {
+		return 0
+	}
+
+	i, err := strconv.Atoi(str)
+	if err != nil {
+		return 0
+	}
+
+	if i <= 0 {
+		return 0
+	}
+
+	return uint(i)
+}
+
 func StringToFloat64(str string) float64 {
 	if len(str) == 0 {
 		return 0

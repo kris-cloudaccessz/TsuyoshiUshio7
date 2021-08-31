@@ -3,9 +3,9 @@ package controller
 import (
 	"fmt"
 	"go-image/cache"
-	"go-image/convert"
 	"go-image/filehandler"
 	"go-image/model"
+	"io"
 	"io/ioutil"
 	"log"
 	"net"
@@ -22,6 +22,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var req = new(model.Goimg_req_t)
+
 	parse, err := url.Parse(urlStr)
 	if err != nil {
 		log.Println(err)
@@ -35,34 +37,22 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	grayscale := convert.StringToBool(r.FormValue("g"))
-
-	var g int8
-	if grayscale {
-		g = 1
-	} else {
-		g = 0
-	}
-
-	rotate := convert.StringToFloat64(r.FormValue("r"))
-	width := convert.StringToInt(r.FormValue("w"))
-	height := convert.StringToInt(r.FormValue("h"))
+	model.ParamHandler(req, r)
 
 	dirPath := imagePath + path
 	sourceFilePath := dirPath + "/0_0"
 	md5Str := parse.Path[1:]
 	var cacheKey string
-
-	if width == 0 && height == 0 {
-		//优先从缓存中读取
-		if cache.IsCache {
-			cacheKey = md5Str + ":0_0"
-			cacheValue := cache.Get(cacheKey)
-			if *cacheValue != nil {
-				w.Write(*cacheValue)
-				return
-			}
-		}
+	if req.P == 0 {
+		// //优先从缓存中读取
+		// if cache.IsCache {
+		// 	cacheKey = md5Str + ":0_0"
+		// 	cacheValue := cache.Get(cacheKey)
+		// 	if *cacheValue != nil {
+		// 		w.Write(*cacheValue)
+		// 		return
+		// 	}
+		// }
 
 		//未找到缓存从磁盘读取
 		file, err := os.Open(sourceFilePath)
@@ -71,21 +61,14 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "未找到文件", http.StatusNotFound)
 			return
 		}
-
-		b, err := ioutil.ReadAll(file)
-		if cache.IsCache {
-			cache.Set(cacheKey, b, 600)
-		}
-		w.Write(b)
+		io.Copy(w, file)
 		file.Close()
 		return
 	}
 
-	filePath := fmt.Sprintf("%s/%d_%d_g%d_r%.0f", dirPath, width, height, g, rotate)
-
 	//从缓存读取
 	if cache.IsCache {
-		cacheKey = fmt.Sprintf("%s:%d_%d_g%d_r%.0f", md5Str, width, height, g, rotate)
+		cacheKey = fmt.Sprintf("%s:%d_%d_g%d_r%.f_p%d_x%d_y%d_q%d.%s", md5Str, req.Width, req.Height, req.Grayscale, req.Rotate, req.P, req.X, req.Y, req.Quality, req.Format)
 		cacheValue := cache.Get(cacheKey)
 		if *cacheValue != nil {
 			w.Write(*cacheValue)
@@ -94,6 +77,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//从硬盘读取
+	filePath := fmt.Sprintf("%s/%d_%d_g%d_r%.f_p%d_x%d_y%d_q%d.%s", dirPath, req.Width, req.Height, req.Grayscale, req.Rotate, req.P, req.X, req.Y, req.Quality, req.Format)
 	file, err := os.Open(filePath)
 	if err == nil {
 		b, _ := ioutil.ReadAll(file)
@@ -110,7 +94,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	b, err := filehandler.ResizeImage(sourceFilePath, uint(width), uint(height), rotate, grayscale, filePath)
+	b, err := filehandler.ResizeImage(sourceFilePath, req, filePath)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "文件处理失败", http.StatusInternalServerError)
@@ -181,13 +165,21 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		err = filehandler.CompressionImage(b, dirPath+"0_0", 75, resp.Data)
+		err = ioutil.WriteFile(dirPath+"0_0", b, 0660)
 		if err != nil {
 			resp.Success = false
 			resp.Message = err.Error()
 			response = append(response, resp)
 			break
 		}
+
+		// err = filehandler.CompressionImage(b, dirPath+"0_0", 75, resp.Data)
+		// if err != nil {
+		// 	resp.Success = false
+		// 	resp.Message = err.Error()
+		// 	response = append(response, resp)
+		// 	break
+		// }
 
 		resp.Success = true
 		resp.Message = "OK"

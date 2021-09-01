@@ -12,12 +12,15 @@ import (
 )
 
 var redisClient *redis.Client
-
+var maxCache uint
+var expireTime uint
 var IsCache bool
 
 func init() {
 
 	IsCache = convert.StringToBool(config.GetSetting("redis.cache"))
+	maxCache = convert.StringToUint(config.GetSetting("redis.max_cache"))
+	expireTime = convert.StringToUint(config.GetSetting("redis.expire_time"))
 
 	if IsCache {
 		redisClient = redis.NewClient(&redis.Options{
@@ -34,10 +37,12 @@ func init() {
 
 }
 
-func Set(key string, value interface{}, second int) {
-	err := redisClient.Set(key, value, time.Second*time.Duration(second)).Err()
-	if err != nil {
-		log.Println(err)
+func Set(key string, value interface{}) {
+	if uint(len(value.([]byte))) <= maxCache {
+		err := redisClient.Set(key, value, time.Second*time.Duration(expireTime)).Err()
+		if err != nil {
+			log.Println(err)
+		}
 	}
 
 }

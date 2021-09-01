@@ -82,7 +82,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		b, _ := ioutil.ReadAll(file)
 		if cache.IsCache {
-			cache.Set(cacheKey, b, 600)
+			cache.Set(cacheKey, b)
 		}
 		w.Write(b)
 		file.Close()
@@ -102,7 +102,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if cache.IsCache {
-		cache.Set(cacheKey, *b, 600)
+		cache.Set(cacheKey, *b)
 	}
 
 	w.Write(*b)
@@ -142,6 +142,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		}
 
 		resp.Data.Mime = http.DetectContentType(b)
+		resp.Data.Size = uint(len(b))
 
 		if !IsType(resp.Data.Mime) {
 			resp.Success = false

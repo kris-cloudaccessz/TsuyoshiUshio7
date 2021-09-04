@@ -2,7 +2,7 @@ package model
 
 import "encoding/json"
 
-const version = "v0.1.0"
+const version = "v0.1.1"
 
 type ResponseBaseModel struct {
 	Success bool   `json:"success"`

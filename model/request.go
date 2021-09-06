@@ -15,6 +15,7 @@ type Goimg_req_t struct {
 	X         int
 	Y         int
 	P         int
+	Download  int
 	Format    string
 }
 
@@ -52,6 +53,12 @@ func ParamHandler(req *Goimg_req_t, r *http.Request) {
 		req.P = 1
 	} else {
 		req.P = convert.StringToInt(r.FormValue("p"))
+	}
+
+	if len(r.FormValue("d")) == 0 {
+		req.Download = 0
+	} else {
+		req.Download = convert.StringToInt(r.FormValue("d"))
 	}
 
 	switch strings.ToLower(r.FormValue("f")) {

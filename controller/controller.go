@@ -43,18 +43,13 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	sourceFilePath := dirPath + "/0_0"
 	md5Str := parse.Path[1:]
 	var cacheKey string
-	if req.P == 0 {
-		// //优先从缓存中读取
-		// if cache.IsCache {
-		// 	cacheKey = md5Str + ":0_0"
-		// 	cacheValue := cache.Get(cacheKey)
-		// 	if *cacheValue != nil {
-		// 		w.Write(*cacheValue)
-		// 		return
-		// 	}
-		// }
 
-		//未找到缓存从磁盘读取
+	//参数d=1时，直接下载文件。
+	if req.Download == 1 {
+		w.Header().Set("Content-Disposition", "attachment;filename="+md5Str+"."+req.Format)
+	}
+
+	if req.P == 0 {
 		file, err := os.Open(sourceFilePath)
 		if err != nil {
 			log.Println(err)

@@ -92,7 +92,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	b, err := filehandler.ResizeImage(sourceFilePath, req, filePath)
 	if err != nil {
 		log.Println(err)
-		http.Error(w, "文件处理失败", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

@@ -18,13 +18,18 @@ func ResizeImage(imagePath string, req *model.Goimg_req_t, outPath string) (*[]b
 		return nil, errors.New("读取图片错误")
 	}
 
+	imageType := mw.GetImageColorspace()
+	if imageType == imagick.COLORSPACE_CMYK {
+		return nil, errors.New("该图片为CMYK，暂不支持处理")
+	}
+
 	width := mw.GetImageWidth()
 	height := mw.GetImageHeight()
 
 	var x, y int
 	var w1, h1 uint
 
-	if req.Width == 0 && req.Width == 0 {
+	if req.Width == 0 && req.Height == 0 {
 		w1 = width
 		h1 = height
 	} else if req.Width == 0 && req.Height != 0 {
@@ -52,10 +57,14 @@ func ResizeImage(imagePath string, req *model.Goimg_req_t, outPath string) (*[]b
 		y = req.Y
 	}
 
-	err = mw.ResizeImage(w1, h1, imagick.FILTER_LANCZOS)
-	if err != nil {
-		log.Println(err)
-		return nil, errors.New("缩放图片错误")
+	mw.StripImage()
+
+	if w1 != width || h1 != height {
+		err = mw.ResizeImage(w1, h1, imagick.FILTER_LANCZOS)
+		if err != nil {
+			log.Println(err)
+			return nil, errors.New("缩放图片错误")
+		}
 	}
 
 	if req.Width != 0 && req.Height != 0 {
@@ -72,6 +81,7 @@ func ResizeImage(imagePath string, req *model.Goimg_req_t, outPath string) (*[]b
 		return nil, errors.New("设置图片格式错误")
 	}
 
+	mw.SetImageCompression(imagick.COMPRESSION_JPEG)
 	err = mw.SetImageCompressionQuality(req.Quality)
 	if err != nil {
 		log.Println(err)

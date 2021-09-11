@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"context"
 	"fmt"
 	"go-image/config"
 	"go-image/convert"
@@ -15,6 +16,7 @@ var redisClient *redis.Client
 var maxCache uint
 var expireTime uint
 var IsCache bool
+var ctx = context.Background()
 
 func init() {
 
@@ -29,7 +31,7 @@ func init() {
 			DB:       convert.StringToInt(config.GetSetting("redis.db")),
 		})
 
-		if _, err := redisClient.Ping().Result(); err != nil {
+		if _, err := redisClient.Ping(ctx).Result(); err != nil {
 			fmt.Println(err)
 			os.Exit(0)
 		}
@@ -39,7 +41,7 @@ func init() {
 
 func Set(key string, value interface{}) {
 	if uint(len(value.([]byte))) <= maxCache {
-		err := redisClient.Set(key, value, time.Second*time.Duration(expireTime)).Err()
+		err := redisClient.Set(ctx, key, value, time.Second*time.Duration(expireTime)).Err()
 		if err != nil {
 			log.Println(err)
 		}
@@ -48,7 +50,7 @@ func Set(key string, value interface{}) {
 }
 
 func Get(key string) *[]byte {
-	val, err := redisClient.Get(key).Bytes()
+	val, err := redisClient.Get(ctx, key).Bytes()
 	if err == redis.Nil || err == nil {
 		return &val
 	}
@@ -57,8 +59,8 @@ func Get(key string) *[]byte {
 }
 
 func Del(key string) {
-	vals, err := redisClient.Keys(key + ":*").Result()
+	vals, err := redisClient.Keys(ctx, key+":*").Result()
 	if err == redis.Nil || err == nil {
-		redisClient.Del(vals...)
+		redisClient.Del(ctx, vals...)
 	}
 }

@@ -5,6 +5,8 @@ import (
 	"go-image/server"
 	"log"
 	"os"
+
+	_ "github.com/icattlecoder/godaemon"
 )
 
 func init() {

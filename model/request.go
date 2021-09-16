@@ -8,13 +8,13 @@ import (
 
 type Goimg_req_t struct {
 	Grayscale int
-	Rotate    float64
+	Rotate    float64 //旋转
 	Width     uint
 	Height    uint
-	Quality   uint
+	Quality   uint //图片质量
 	X         int
 	Y         int
-	P         int
+	P         int //原图
 	Download  int
 	Format    string
 }

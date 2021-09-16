@@ -1,12 +1,43 @@
 # goimg
 
 #### 介绍
-{**以下是码云平台说明，您可以替换此简介**
-码云是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用码云实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+一个轻量型的图片服务器
+
 
 #### 软件架构
-软件架构说明
+上传接口：
+http://127.0.0.1:8080/upload
+
+参数：Files 类型：文件
+
+
+返回结果：
+[{"success":true,"message":"OK","version":"v0.1.1","data":{"size":49160,"mime":"image/jpeg","fileId":"5781339b809d5f18132f5c4fbe9df2fe","fileName":"gss0.baidu.jpg"}}]
+
+使用说明：
+http://127.0.0.1:8080/5781339b809d5f18132f5c4fbe9df2fe  默认：压缩质量为75%
+
+访问原图：
+http://127.0.0.1:8080/5781339b809d5f18132f5c4fbe9df2fe?p=0   //p=0 查看原图
+
+下载图片
+http://127.0.0.1:8080/5781339b809d5f18132f5c4fbe9df2fe?d=1  //d=1 下载图片，浏览器不再展示图片
+
+灰阶图
+http://127.0.0.1:8080/5781339b809d5f18132f5c4fbe9df2fe?g=1  //g=1 灰阶图
+
+缩放
+http://127.0.0.1:8080/5781339b809d5f18132f5c4fbe9df2fe?w=100&h=100  //w宽度 h高度
+
+压缩
+http://127.0.0.1:8080/5781339b809d5f18132f5c4fbe9df2fe?q=75     //q 压缩质量 
+
+转换格式
+http://127.0.0.1:8080/5781339b809d5f18132f5c4fbe9df2fe?f=png    //f 转换格式 
+
+旋转
+http://127.0.0.1:8080/5781339b809d5f18132f5c4fbe9df2fe?r=90   //r 旋转图像
+
 
 
 #### 安装教程
@@ -31,9 +62,3 @@
 
 #### 码云特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5.  码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)

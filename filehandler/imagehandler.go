@@ -39,16 +39,16 @@ func ResizeImage(imagePath string, req *model.Goimg_req_t, outPath string) (*[]b
 		h1 = height * req.Width / width
 		w1 = req.Width
 	} else {
-		if width < height {
+		if req.Width < req.Height {
 			h1 = height * req.Width / width
 			w1 = req.Width
-			x = 0
-			y = int((h1 - req.Height) / 2)
+			//x = 0
+			//y = int((h1 - req.Height) / 2)
 		} else {
 			w1 = req.Height * width / height
 			h1 = req.Height
-			x = int((w1 - req.Width) / 2)
-			y = 0
+			//x = int((w1 - req.Width) / 2)
+			//y = 0
 		}
 	}
 
@@ -59,19 +59,23 @@ func ResizeImage(imagePath string, req *model.Goimg_req_t, outPath string) (*[]b
 
 	mw.StripImage()
 
-	if w1 != width || h1 != height {
-		err = mw.ResizeImage(w1, h1, imagick.FILTER_LANCZOS)
-		if err != nil {
-			log.Println(err)
-			return nil, errors.New("缩放图片错误")
+	if req.X >= 0 && req.Y >= 0 {
+		//x 和 y 存在值时表示裁切
+		if req.Width != 0 && req.Height != 0 {
+			err = mw.CropImage(req.Width, req.Height, x, y)
+			if err != nil {
+				log.Println(err)
+				return nil, errors.New("裁切图片错误")
+			}
 		}
-	}
-
-	if req.Width != 0 && req.Height != 0 {
-		err = mw.CropImage(req.Width, req.Height, x, y)
-		if err != nil {
-			log.Println(err)
-			return nil, errors.New("裁切图片错误")
+	} else {
+		// x 和 y 不存在值时，缩放
+		if w1 != width || h1 != height {
+			err = mw.ResizeImage(w1, h1, imagick.FILTER_LANCZOS)
+			if err != nil {
+				log.Println(err)
+				return nil, errors.New("缩放图片错误")
+			}
 		}
 	}
 

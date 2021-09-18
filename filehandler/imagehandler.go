@@ -29,55 +29,77 @@ func ResizeImage(imagePath string, req *model.Goimg_req_t, outPath string) (*[]b
 	var x, y int
 	var w1, h1 uint
 
-	if req.Width == 0 && req.Height == 0 {
-		w1 = width
-		h1 = height
-	} else if req.Width == 0 && req.Height != 0 {
-		w1 = req.Height * width / height
-		h1 = req.Height
-	} else if req.Height == 0 && req.Width != 0 {
-		h1 = height * req.Width / width
-		w1 = req.Width
-	} else {
-		if req.Width < req.Height {
-			h1 = height * req.Width / width
-			w1 = req.Width
-			//x = 0
-			//y = int((h1 - req.Height) / 2)
-		} else {
-			w1 = req.Height * width / height
-			h1 = req.Height
-			//x = int((w1 - req.Width) / 2)
-			//y = 0
-		}
-	}
-
-	if req.X != -1 && req.Y != -1 {
+	if req.X >= 0 && req.Y >= 0 {
 		x = req.X
 		y = req.Y
-	}
-
-	mw.StripImage()
-
-	if req.X >= 0 && req.Y >= 0 {
-		//x 和 y 存在值时表示裁切
 		if req.Width != 0 && req.Height != 0 {
-			err = mw.CropImage(req.Width, req.Height, x, y)
+			if req.Width >= width {
+				w1 = width
+			} else {
+				w1 = req.Width
+			}
+
+			if req.Height >= height {
+				h1 = height
+			} else {
+				h1 = req.Height
+			}
+
+			err = mw.CropImage(w1, h1, x, y)
 			if err != nil {
 				log.Println(err)
 				return nil, errors.New("裁切图片错误")
 			}
 		}
 	} else {
-		// x 和 y 不存在值时，缩放
-		if w1 != width || h1 != height {
+		if req.Width == 0 && req.Height == 0 {
+			w1 = width
+			h1 = height
+		} else if req.Width == 0 || req.Height == 0 {
+			if req.Width == 0 {
+				w1 = req.Height * width / height
+				h1 = req.Height
+			}
+
+			if req.Height == 0 {
+				h1 = height * req.Width / width
+				w1 = req.Width
+			}
+
 			err = mw.ResizeImage(w1, h1, imagick.FILTER_LANCZOS)
 			if err != nil {
 				log.Println(err)
 				return nil, errors.New("缩放图片错误")
 			}
+
+		} else {
+			if width < height {
+				h1 = height * req.Width / width
+				w1 = req.Width
+				x = 0
+				y = int((h1 - req.Height) / 2)
+			} else {
+				w1 = req.Height * width / height
+				h1 = req.Height
+				x = int((w1 - req.Width) / 2)
+				y = 0
+			}
+
+			err = mw.ResizeImage(w1, h1, imagick.FILTER_LANCZOS)
+			if err != nil {
+				log.Println(err)
+				return nil, errors.New("缩放图片错误")
+			}
+
+			err = mw.CropImage(req.Width, req.Height, x, y)
+			if err != nil {
+				log.Println(err)
+				return nil, errors.New("裁切图片错误")
+			}
 		}
 	}
+
+	mw.StripImage()
 
 	err = mw.SetImageFormat(req.Format)
 	if err != nil {

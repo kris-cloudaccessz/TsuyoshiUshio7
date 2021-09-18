@@ -50,7 +50,7 @@ func ParamHandler(req *Goimg_req_t, r *http.Request) {
 	}
 
 	if len(r.FormValue("p")) == 0 {
-		req.P = 1
+		req.P = 0
 	} else {
 		req.P = convert.StringToInt(r.FormValue("p"))
 	}

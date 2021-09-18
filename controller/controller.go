@@ -49,7 +49,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Disposition", "attachment;filename="+md5Str+"."+req.Format)
 	}
 
-	if req.P == 0 {
+	if req.P == 1 {
 		file, err := os.Open(sourceFilePath)
 		if err != nil {
 			log.Println(err)

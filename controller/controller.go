@@ -58,8 +58,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "未找到文件", http.StatusNotFound)
 			return
 		}
+		defer file.Close()
 		io.Copy(w, file)
-		file.Close()
 		return
 	}
 
@@ -77,12 +77,12 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	filePath := fmt.Sprintf("%s/%d_%d_g%d_r%.f_p%d_x%d_y%d_q%d.%s", dirPath, req.Width, req.Height, req.Grayscale, req.Rotate, req.P, req.X, req.Y, req.Quality, req.Format)
 	file, err := os.Open(filePath)
 	if err == nil {
+		defer file.Close()
 		b, _ := ioutil.ReadAll(file)
 		if cache.IsCache {
 			cache.Set(cacheKey, b)
 		}
 		w.Write(b)
-		file.Close()
 		return
 	}
 

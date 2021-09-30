@@ -107,8 +107,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 //Uploads upload files function.
 func Upload(w http.ResponseWriter, r *http.Request) {
-
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	//允许跨域
+	//w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	r.ParseMultipartForm(1024 << 14)
 

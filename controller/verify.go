@@ -20,6 +20,10 @@ func IsType(typeStr string) bool {
 }
 
 func IsAllow(ip string) bool {
+	if len(adminIPs) == 1 && adminIPs[0] == "*" {
+		return true
+	}
+
 	for _, v := range adminIPs {
 		if v == ip {
 			return true

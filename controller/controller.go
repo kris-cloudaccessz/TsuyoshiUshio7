@@ -216,19 +216,23 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	md5Path := SavePath(md5Str)
-
 	if _, err = os.Stat(imagePath + md5Path); err == nil || os.IsExist(err) {
 		err = os.RemoveAll(imagePath + md5Path)
 		if err != nil {
 			http.Error(w, "删除失败", http.StatusInternalServerError)
 			return
 		}
-		cache.Del(md5Str)
-		fmt.Fprintln(w, "ok")
-		return
-	}
 
-	fmt.Fprintln(w, "文件不存在")
+		if cache.IsCache {
+			cache.Del(md5Str)
+		}
+
+		log.Println(remoteIP, "|delete|", md5Str)
+		fmt.Fprintln(w, "ok")
+	} else {
+		log.Println(err)
+		fmt.Fprintln(w, "文件不存在")
+	}
 }
 
 func responseError(w http.ResponseWriter, code int) {

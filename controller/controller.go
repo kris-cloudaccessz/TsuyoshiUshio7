@@ -49,7 +49,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Disposition", "attachment;filename="+md5Str+"."+req.Format)
 	}
 
-	w.Header().Set("Cache-Control", "max-age=604800") //强制浏览器缓存
+	w.Header().Set("Cache-Control", "max-age=3600") //强制浏览器缓存
 	//w.Header().Set("Expires", time.Now().Add(10*time.Hour).UTC().Format(http.TimeFormat))
 	if req.P == 1 {
 		file, err := os.Open(sourceFilePath)
@@ -140,7 +140,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		resp.Data.Mime = http.DetectContentType(b)
+		resp.Data.Mime = http.DetectContentType(b[:512])
 		resp.Data.Size = uint(len(b))
 
 		if !IsType(resp.Data.Mime) {
